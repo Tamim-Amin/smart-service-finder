@@ -45,4 +45,33 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function userRole()
+{
+    return $this->hasOne(UserRole::class);
+}
+
+public function provider()
+{
+    return $this->hasOne(Provider::class);
+}
+
+public function bookings()
+{
+    return $this->hasMany(Booking::class, 'customer_id');
+}
+
+public function isCustomer()
+{
+    return $this->userRole && $this->userRole->role === 'customer';
+}
+
+public function isProvider()
+{
+    return $this->userRole && $this->userRole->role === 'provider';
+}
+
+public function isAdmin()
+{
+    return $this->userRole && $this->userRole->role === 'admin';
+}
 }
