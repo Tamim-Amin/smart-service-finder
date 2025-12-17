@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -46,32 +46,37 @@ class User extends Authenticatable
         ];
     }
     public function userRole()
-{
-    return $this->hasOne(UserRole::class);
-}
+    {
+        return $this->hasOne(UserRole::class);
+    }
 
-public function provider()
-{
-    return $this->hasOne(Provider::class);
-}
+    public function provider()
+    {
+        return $this->hasOne(Provider::class);
+    }
 
-public function bookings()
-{
-    return $this->hasMany(Booking::class, 'customer_id');
-}
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'customer_id');
+    }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'customer_id');
+    }
 
-public function isCustomer()
-{
-    return $this->userRole && $this->userRole->role === 'customer';
-}
+    public function isCustomer()
+    {
+        return $this->userRole && $this->userRole->role === 'customer';
+    }
 
-public function isProvider()
-{
-    return $this->userRole && $this->userRole->role === 'provider';
-}
+    public function isProvider()
+    {
+        return $this->userRole && $this->userRole->role === 'provider';
+    }
 
-public function isAdmin()
-{
-    return $this->userRole && $this->userRole->role === 'admin';
-}
+    public function isAdmin()
+    {
+        return $this->userRole && $this->userRole->role === 'admin';
+    }
+    
 }

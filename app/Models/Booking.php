@@ -15,6 +15,9 @@ class Booking extends Model
         'status'
     ];
 
+    protected $casts = [
+        'service_date' => 'date',
+    ];
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
