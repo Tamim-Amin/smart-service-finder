@@ -15,7 +15,13 @@
             @endif
 
             <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 overflow-hidden shadow-lg sm:rounded-lg">
+                    <div class="p-6 text-white">
+                        <p class="text-sm opacity-90 mb-1">Total Earnings</p>
+                        <p class="text-3xl font-bold">৳{{ number_format($provider->total_earnings, 0) }}</p>
+                    </div>
+                </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <p class="text-sm text-gray-600 mb-1">Total Bookings</p>
@@ -101,7 +107,7 @@
                     <h3 class="text-xl font-semibold mb-6">Booking Requests</h3>
 
                     @forelse($bookings as $booking)
-                        <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                        <div class="border border-gray-200 rounded-lg p-4 mb-4 {{ $booking->status == 'completed' ? 'bg-green-50' : '' }}">
                             <div class="flex justify-between items-start">
                                 <div class="flex-1">
                                     <h4 class="text-lg font-semibold mb-2">{{ $booking->customer->name }}</h4>
@@ -110,6 +116,11 @@
                                         <p><strong>Time:</strong> {{ date('g:i A', strtotime($booking->service_time)) }}</p>
                                         <p><strong>Problem:</strong> {{ $booking->problem_description }}</p>
                                         <p><strong>Contact:</strong> {{ $booking->customer->email }}</p>
+                                        @if($booking->total_hours && $booking->total_amount)
+                                            <p class="text-green-600 font-semibold mt-2">
+                                                💰 Earned: ৳{{ number_format($booking->total_amount, 0) }} ({{ $booking->total_hours }} hours)
+                                            </p>
+                                        @endif
                                         <p class="text-xs text-gray-500 mt-2">Requested: {{ $booking->created_at->diffForHumans() }}</p>
                                     </div>
                                 </div>
@@ -141,12 +152,18 @@
                                             @csrf
                                             @method('PUT')
                                             <input type="hidden" name="status" value="completed">
-                                            <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700 transition">
+                                            <div class="mb-2">
+                                                <label class="block text-xs text-gray-600 mb-1">Total Hours:</label>
+                                                <input type="number" name="total_hours" min="1" required
+                                                    class="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    placeholder="Hours">
+                                            </div>
+                                            <button type="submit" class="w-full bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700 transition">
                                                 Mark Complete
                                             </button>
                                         </form>
                                     @elseif($booking->status == 'completed')
-                                        <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">Completed</span>
+                                        <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">Completed ✓</span>
                                         @if($booking->review)
                                             <div class="mt-2 text-right">
                                                 <div class="flex items-center justify-end mb-1">

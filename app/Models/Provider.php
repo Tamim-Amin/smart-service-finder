@@ -16,7 +16,15 @@ class Provider extends Model
         'is_available',
         'is_verified',
         'average_rating',
-        'total_reviews'
+        'total_reviews',
+        'total_earnings',
+    ];
+    protected $casts = [
+        'is_available' => 'boolean',
+        'is_verified' => 'boolean',
+        'hourly_rate' => 'decimal:2',
+        'average_rating' => 'decimal:2',
+        'total_earnings' => 'decimal:2', // Add this line
     ];
     public function user()
     {

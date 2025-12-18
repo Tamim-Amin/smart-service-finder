@@ -12,12 +12,16 @@ class Booking extends Model
         'problem_description',
         'service_date',
         'service_time',
-        'status'
+        'status',
+        'total_amount',  // Add this line
+        'total_hours'    // Add this line
     ];
 
     protected $casts = [
         'service_date' => 'date',
+        'total_amount' => 'decimal:2',  // Add this line
     ];
+
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');

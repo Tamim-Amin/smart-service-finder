@@ -27,6 +27,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Earnings</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                                 </tr>
@@ -49,6 +50,9 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ number_format($provider->average_rating, 1) }} ({{ $provider->total_reviews }})
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                                            ৳{{ number_format($provider->total_earnings, 0) }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($provider->is_verified)
@@ -74,7 +78,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                                             No providers found
                                         </td>
                                     </tr>

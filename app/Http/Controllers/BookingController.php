@@ -52,7 +52,26 @@ class BookingController extends Controller
 
         $validated = $request->validate([
             'status' => 'required|in:accepted,rejected,completed',
+            'total_hours' => 'nullable|required_if:status,completed|integer|min:1',
         ]);
+
+        // If marking as completed, calculate earnings
+        if ($validated['status'] === 'completed') {
+            $totalHours = $validated['total_hours'];
+            $totalAmount = $totalHours * $provider->hourly_rate;
+
+            // Update booking with amount and hours
+            $booking->update([
+                'status' => 'completed',
+                'total_hours' => $totalHours,
+                'total_amount' => $totalAmount,
+            ]);
+
+            // Update provider's total earnings
+            $provider->increment('total_earnings', $totalAmount);
+
+            return back()->with('success', "Service completed! Earned: ৳{$totalAmount} ({$totalHours} hours × ৳{$provider->hourly_rate}/hr)");
+        }
 
         $booking->update(['status' => $validated['status']]);
 
