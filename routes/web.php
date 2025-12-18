@@ -8,6 +8,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EarningsController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfilePhotoController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -19,7 +20,7 @@ Route::get('/', function () {
 // Dashboard Route - Redirects based on user role
 Route::get('/dashboard', function () {
     $user = auth()->user();
-    
+
     if (!$user) {
         return redirect()->route('login');
     }
@@ -56,10 +57,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
-    
+
     // Search Providers
     Route::get('/search', [CustomerController::class, 'searchProviders'])->name('search');
-    
+
     // My Bookings
     Route::get('/bookings', [CustomerController::class, 'myBookings'])->name('bookings');
 });
@@ -68,7 +69,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
 Route::middleware(['auth', 'role:provider'])->prefix('provider')->name('provider.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [ProviderController::class, 'dashboard'])->name('dashboard');
-    
+
     // Profile Management
     Route::get('/profile/create', [ProviderController::class, 'createProfile'])->name('profile.create');
     Route::post('/profile', [ProviderController::class, 'storeProfile'])->name('profile.store');
@@ -83,10 +84,10 @@ Route::middleware(['auth'])->prefix('bookings')->name('bookings.')->group(functi
     // Create Booking (Customer only)
     Route::get('/create/{provider}', [BookingController::class, 'create'])->name('create');
     Route::post('/', [BookingController::class, 'store'])->name('store');
-    
+
     // Update Booking Status (Provider only)
     Route::put('/{booking}/status', [BookingController::class, 'updateStatus'])->name('updateStatus');
-    
+
     // Cancel Booking (Customer only)
     Route::put('/{booking}/cancel', [BookingController::class, 'cancel'])->name('cancel');
 });
@@ -102,22 +103,22 @@ Route::middleware(['auth', 'role:customer'])->prefix('reviews')->name('reviews.'
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    
+
     // Provider Management
     Route::get('/providers', [AdminController::class, 'providers'])->name('providers');
     Route::put('/providers/{provider}/verify', [AdminController::class, 'verifyProvider'])->name('providers.verify');
     Route::delete('/providers/{provider}', [AdminController::class, 'deleteProvider'])->name('providers.delete');
-    
+
     // Category Management
     Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
     Route::put('/categories/{category}', [AdminController::class, 'updateCategory'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('categories.delete');
-    
+
     // User Management
     Route::get('/users', [AdminController::class, 'users'])->name('users');
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
-    
+
     // System Logs (Optional - for future implementation)
     Route::get('/logs', [AdminController::class, 'logs'])->name('logs');
 });
@@ -129,11 +130,21 @@ Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->gr
     Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
     Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unreadCount');
 });
+Route::middleware('auth')->group(function () {
+    // Existing profile routes...
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Profile Photo Routes
+    Route::get('/profile/photo', [ProfilePhotoController::class, 'edit'])->name('profile.photo.edit');
+    Route::post('/profile/photo', [ProfilePhotoController::class, 'update'])->name('profile.photo.update');
+    Route::delete('/profile/photo', [ProfilePhotoController::class, 'destroy'])->name('profile.photo.destroy');
+});
 /*Public Routes (Optional - for viewing provider profiles publicly)*/
 // View Provider Public Profile
 Route::get('/providers/{provider}', [CustomerController::class, 'viewProvider'])->name('providers.show');
 
 // Browse All Providers (Public)
 Route::get('/browse', [CustomerController::class, 'browseProviders'])->name('browse');
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
