@@ -6,6 +6,7 @@ use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EarningsController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -72,6 +73,8 @@ Route::middleware(['auth', 'role:provider'])->prefix('provider')->name('provider
     Route::post('/profile', [ProviderController::class, 'storeProfile'])->name('profile.store');
     Route::get('/profile/edit', [ProviderController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [ProviderController::class, 'updateProfile'])->name('profile.update');
+    // Earnings Route
+    Route::get('/earnings', [EarningsController::class, 'index'])->name('earnings');
 });
 
 /*Booking Routes (Shared between Customer and Provider)*/
