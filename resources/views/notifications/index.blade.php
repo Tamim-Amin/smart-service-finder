@@ -27,7 +27,8 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     @forelse($notifications as $notification)
-                        <div class="border-b border-gray-200 py-4 {{ !$notification->is_read ? 'bg-blue-50' : '' }} px-4 rounded-lg mb-2">
+                        <a href="{{ $notification->booking_id ? (auth()->user()->userRole->role === 'provider' ? route('provider.dashboard') : route('customer.bookings')) : '#' }}" class="block">
+                            <div class="border-b border-gray-200 py-4 {{ !$notification->is_read ? 'bg-blue-50' : '' }} px-4 rounded-lg mb-2">
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start flex-1">
                                     <div class="flex-shrink-0 mr-4">
@@ -76,6 +77,7 @@
                                 @endif
                             </div>
                         </div>
+                        </a>
                     @empty
                         <div class="text-center py-12">
                             <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
