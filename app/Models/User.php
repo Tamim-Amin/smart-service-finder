@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_photo',
     ];
 
     /**
@@ -79,13 +80,22 @@ class User extends Authenticatable
         return $this->userRole && $this->userRole->role === 'admin';
     }
     public function notifications()
-{
-    return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
-}
+    {
+        return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
+    }
 
-public function unreadNotifications()
-{
-    return $this->hasMany(Notification::class)->where('is_read', false);
-}
-    
+    public function unreadNotifications()
+    {
+        return $this->hasMany(Notification::class)->where('is_read', false);
+    }
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->profile_photo) {
+            return asset('storage/' . $this->profile_photo);
+        }
+
+        // Return default avatar with user's initials
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
 }
