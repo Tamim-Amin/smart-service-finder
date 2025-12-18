@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Provider;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,13 +30,25 @@ class BookingController extends Controller
             'service_time' => 'required',
         ]);
 
-        Booking::create([
+        $booking = Booking::create([
             'customer_id' => Auth::id(),
             'provider_id' => $validated['provider_id'],
             'problem_description' => $validated['problem_description'],
             'service_date' => $validated['service_date'],
             'service_time' => $validated['service_time'],
             'status' => 'pending',
+        ]);
+
+        // Get provider user
+        $provider = Provider::with('user')->findOrFail($validated['provider_id']);
+
+        // Create notification for provider
+        Notification::create([
+            'user_id' => $provider->user_id,
+            'type' => 'booking_request',
+            'title' => 'New Booking Request',
+            'message' => Auth::user()->name . ' has requested your service for ' . $validated['service_date'],
+            'booking_id' => $booking->id,
         ]);
 
         return redirect()->route('customer.bookings')->with('success', 'Booking request sent successfully!');
@@ -70,10 +83,39 @@ class BookingController extends Controller
             // Update provider's total earnings
             $provider->increment('total_earnings', $totalAmount);
 
+            // Create notification for customer
+            Notification::create([
+                'user_id' => $booking->customer_id,
+                'type' => 'booking_completed',
+                'title' => 'Service Completed',
+                'message' => 'Your booking with ' . Auth::user()->name . ' has been completed. Total: ৳' . number_format($totalAmount, 0),
+                'booking_id' => $booking->id,
+            ]);
+
             return back()->with('success', "Service completed! Earned: ৳{$totalAmount} ({$totalHours} hours × ৳{$provider->hourly_rate}/hr)");
         }
 
+        // Update booking status
         $booking->update(['status' => $validated['status']]);
+
+        // Create notification for customer
+        if ($validated['status'] === 'accepted') {
+            Notification::create([
+                'user_id' => $booking->customer_id,
+                'type' => 'booking_accepted',
+                'title' => 'Booking Accepted',
+                'message' => Auth::user()->name . ' has accepted your booking request for ' . $booking->service_date->format('M d, Y'),
+                'booking_id' => $booking->id,
+            ]);
+        } elseif ($validated['status'] === 'rejected') {
+            Notification::create([
+                'user_id' => $booking->customer_id,
+                'type' => 'booking_rejected',
+                'title' => 'Booking Rejected',
+                'message' => Auth::user()->name . ' has rejected your booking request. Please try booking another provider.',
+                'booking_id' => $booking->id,
+            ]);
+        }
 
         return back()->with('success', 'Booking status updated successfully!');
     }
