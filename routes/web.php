@@ -7,6 +7,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EarningsController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -119,6 +120,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     // System Logs (Optional - for future implementation)
     Route::get('/logs', [AdminController::class, 'logs'])->name('logs');
+});
+
+// Notification Routes
+Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->group(function () {
+    Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::put('/{id}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+    Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+    Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unreadCount');
 });
 
 /*Public Routes (Optional - for viewing provider profiles publicly)*/
