@@ -78,5 +78,14 @@ class User extends Authenticatable
     {
         return $this->userRole && $this->userRole->role === 'admin';
     }
+    public function notifications()
+{
+    return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
+}
+
+public function unreadNotifications()
+{
+    return $this->hasMany(Notification::class)->where('is_read', false);
+}
     
 }
