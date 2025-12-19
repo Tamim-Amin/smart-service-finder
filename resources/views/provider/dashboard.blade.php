@@ -32,7 +32,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>
-                        <p class="text-3xl font-bold mb-1">৳{{ number_format($provider->total_earnings, 0) }}</p>
+                        <p class="text-3xl font-bold mb-1">৳{{ number_format($provider->total_earnings ?? 0, 0) }}</p>
                         <p class="text-xs opacity-75">Click for detailed summary</p>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <p class="text-sm text-gray-600 mb-1">Total Bookings</p>
-                        <p class="text-3xl font-bold text-indigo-600">{{ $stats['total_bookings'] }}</p>
+                        <p class="text-3xl font-bold text-indigo-600">{{ $stats['total_bookings'] ?? 0 }}</p>
                     </div>
                 </div>
 
@@ -49,7 +49,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <p class="text-sm text-gray-600 mb-1">Pending</p>
-                        <p class="text-3xl font-bold text-yellow-600">{{ $stats['pending'] }}</p>
+                        <p class="text-3xl font-bold text-yellow-600">{{ $stats['pending'] ?? 0 }}</p>
                     </div>
                 </div>
 
@@ -57,7 +57,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <p class="text-sm text-gray-600 mb-1">Accepted</p>
-                        <p class="text-3xl font-bold text-green-600">{{ $stats['accepted'] }}</p>
+                        <p class="text-3xl font-bold text-green-600">{{ $stats['accepted'] ?? 0 }}</p>
                     </div>
                 </div>
 
@@ -65,7 +65,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <p class="text-sm text-gray-600 mb-1">Completed</p>
-                        <p class="text-3xl font-bold text-blue-600">{{ $stats['completed'] }}</p>
+                        <p class="text-3xl font-bold text-blue-600">{{ $stats['completed'] ?? 0 }}</p>
                     </div>
                 </div>
             </div>
@@ -170,7 +170,7 @@
                                             </div>
                                         </div>
                                         
-                                        @if($booking->total_hours && $booking->total_amount)
+                                        @if(isset($booking->total_hours) && isset($booking->total_amount))
                                             <div class="flex items-center mt-2 pt-2 border-t border-gray-200">
                                                 <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -235,7 +235,7 @@
                                         </form>
                                     @elseif($booking->status == 'completed')
                                         <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-medium">✓ Completed</span>
-                                        @if($booking->review)
+                                        @if(isset($booking->review))
                                             <div class="mt-2 text-right">
                                                 <p class="text-xs text-gray-600 mb-1">Customer Review:</p>
                                                 <div class="flex items-center justify-end mb-1">
