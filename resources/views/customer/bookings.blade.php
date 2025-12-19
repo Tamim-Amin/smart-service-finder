@@ -56,6 +56,22 @@
                                 @endif
                             </div>
                         </div>
+                        @if($booking->status == 'accepted' || $booking->status == 'completed')
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <a href="{{ route('chat.show', $booking->id) }}"
+                                class="inline-flex items-center bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                Chat with {{ $booking->provider->user->name }}
+                                @if($booking->unreadMessagesFor(Auth::id()) > 0)
+                                <span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                    {{ $booking->unreadMessagesFor(Auth::id()) }}
+                                </span>
+                                @endif
+                            </a>
+                        </div>
+                        @endif
 
                         @if($booking->status == 'completed' && !$booking->review)
                         <div class="mt-4 pt-4 border-t border-gray-200">
