@@ -112,7 +112,8 @@
 
         function selectAvatar(style, seed) {
             if (confirm('Use this avatar as your profile photo?')) {
-                const avatarUrl = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
+                // FIX 1: Change '/svg' to '/png' so it passes the 'mimes:png' validation
+                const avatarUrl = `https://api.dicebear.com/7.x/${style}/png?seed=${seed}`;
 
                 fetch(avatarUrl)
                     .then(response => response.blob())
@@ -123,13 +124,24 @@
 
                         fetch('{{ route("profile.photo.update") }}', {
                             method: 'POST',
+                            headers: {
+                                // FIX 2: Tell Laravel we want a JSON response
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
                             body: formData
                         })
-                            .then(response => response.json())
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Upload failed');
+                                }
+                                return response.json();
+                            })
                             .then(data => {
                                 window.location.reload();
                             })
                             .catch(error => {
+                                console.error(error);
                                 alert('Error uploading avatar. Please try uploading an image instead.');
                             });
                     });

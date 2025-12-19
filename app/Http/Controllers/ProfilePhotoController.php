@@ -34,6 +34,15 @@ class ProfilePhotoController extends Controller
             'profile_photo' => $path
         ]);
 
+        // FIX: This check must be here in ProfilePhotoController
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true, 
+                'path' => $path,
+                'url' => asset('storage/' . $path)
+            ]);
+        }
+
         return back()->with('success', 'Profile photo updated successfully!');
     }
 
