@@ -36,4 +36,16 @@ class Booking extends Model
     {
         return $this->hasOne(Review::class);
     }
+    public function messages()
+    {
+        return $this->hasMany(Message::class)->orderBy('created_at', 'asc');
+    }
+
+    public function unreadMessagesFor($userId)
+    {
+        return $this->messages()
+            ->where('receiver_id', $userId)
+            ->where('is_read', false)
+            ->count();
+    }
 }
