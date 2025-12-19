@@ -84,33 +84,34 @@ class ChatController extends Controller
         return redirect()->route('chat.show', $bookingId);
     }
 
-    public function getMessages($bookingId)
+   public function getMessages(Request $request, $bookingId)
     {
         $booking = Booking::findOrFail($bookingId);
-
         $userId = Auth::id();
-        $isCustomer = $booking->customer_id === $userId;
-        $isProvider = $booking->provider->user_id === $userId;
 
-        if (!$isCustomer && !$isProvider) {
+        // Check authorization
+        if ($booking->customer_id !== $userId && $booking->provider->user_id !== $userId) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Check if booking is still accepted
-        if ($booking->status !== 'accepted') {
-            return response()->json(['status' => 'closed']);
-        }
+        // Get the last message ID the client already has
+        $lastId = $request->query('last_id', 0);
 
+        // Fetch only NEW messages created after that ID
         $messages = $booking->messages()
             ->with('sender')
-            ->where('created_at', '>', now()->subMinutes(1))
+            ->where('id', '>', $lastId) // Critical change here
+            ->orderBy('created_at', 'asc')
             ->get();
 
-        // Mark as read
-        $booking->messages()
-            ->where('receiver_id', $userId)
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
+        // Mark them as read
+        if ($messages->isNotEmpty()) {
+            $booking->messages()
+                ->where('receiver_id', $userId)
+                ->where('is_read', false)
+                ->whereIn('id', $messages->pluck('id'))
+                ->update(['is_read' => true]);
+        }
 
         return response()->json([
             'messages' => $messages,

@@ -136,9 +136,9 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('profile.photo.edit')">
+                            <!-- <x-dropdown-link :href="route('profile.photo.edit')">
                                 {{ __('Profile Photo') }}
-                            </x-dropdown-link>
+                            </x-dropdown-link> -->
                             <x-dropdown-link :href="route('profile.edit')">
                                 {{ __('Profile') }}
                             </x-dropdown-link>
