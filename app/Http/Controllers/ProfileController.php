@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -48,8 +49,14 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // FIX: Delete the profile photo from storage if it exists
+        if ($user->profile_photo) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
+
         Auth::logout();
 
+        // This triggers the DB cascading deletes defined in your migrations
         $user->delete();
 
         $request->session()->invalidate();
