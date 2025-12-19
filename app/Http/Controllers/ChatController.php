@@ -23,9 +23,17 @@ class ChatController extends Controller
             abort(403, 'Unauthorized access to this chat.');
         }
 
-        // Only allow chat for accepted bookings
-        if ($booking->status !== 'accepted' && $booking->status !== 'completed') {
-            return redirect()->back()->with('error', 'Chat is only available for accepted bookings.');
+        // Only allow chat for ACCEPTED bookings (not completed, rejected, or cancelled)
+        if ($booking->status !== 'accepted') {
+            if ($booking->status === 'completed') {
+                return redirect()->back()->with('error', 'Chat is closed. The service has been completed.');
+            } elseif ($booking->status === 'rejected') {
+                return redirect()->back()->with('error', 'Chat is not available for rejected bookings.');
+            } elseif ($booking->status === 'cancelled') {
+                return redirect()->back()->with('error', 'Chat is not available for cancelled bookings.');
+            } else {
+                return redirect()->back()->with('error', 'Chat is only available for accepted bookings.');
+            }
         }
 
         // Mark messages as read
@@ -52,6 +60,11 @@ class ChatController extends Controller
 
         if (!$isCustomer && !$isProvider) {
             abort(403);
+        }
+
+        // Block messaging if booking is completed
+        if ($booking->status !== 'accepted') {
+            return redirect()->back()->with('error', 'Cannot send messages. Booking is ' . $booking->status . '.');
         }
 
         $validated = $request->validate([
@@ -81,6 +94,11 @@ class ChatController extends Controller
 
         if (!$isCustomer && !$isProvider) {
             return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Check if booking is still accepted
+        if ($booking->status !== 'accepted') {
+            return response()->json(['status' => 'closed']);
         }
 
         $messages = $booking->messages()
