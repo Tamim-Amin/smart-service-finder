@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EarningsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfilePhotoController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -140,6 +141,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/photo', [ProfilePhotoController::class, 'edit'])->name('profile.photo.edit');
     Route::post('/profile/photo', [ProfilePhotoController::class, 'update'])->name('profile.photo.update');
     Route::delete('/profile/photo', [ProfilePhotoController::class, 'destroy'])->name('profile.photo.destroy');
+});
+// Chat Routes
+Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
+    Route::get('/{booking}', [ChatController::class, 'show'])->name('show');
+    Route::post('/{booking}', [ChatController::class, 'store'])->name('store');
+    Route::get('/{booking}/messages', [ChatController::class, 'getMessages'])->name('messages');
 });
 /*Public Routes (Optional - for viewing provider profiles publicly)*/
 // View Provider Public Profile
