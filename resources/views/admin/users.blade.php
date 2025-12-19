@@ -8,6 +8,12 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <h3 class="text-xl font-semibold mb-6">All Users</h3>
@@ -16,17 +22,23 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($users as $user)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ $user->name }}
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <img src="{{ $user->profile_photo_url }}" 
+                                                     alt="{{ $user->name }}" 
+                                                     class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 mr-3">
+                                                <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $user->email }}
@@ -43,10 +55,24 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $user->created_at->format('M d, Y') }}
                                         </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            @if($user->id !== auth()->id())
+                                                <button onclick="if(confirm('Are you sure you want to delete this user?')) document.getElementById('delete-user-{{ $user->id }}').submit();" 
+                                                    class="text-red-600 hover:text-red-900">
+                                                    Delete
+                                                </button>
+                                                <form id="delete-user-{{ $user->id }}" action="{{ route('admin.users.delete', $user->id) }}" method="POST" class="hidden">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                            @else
+                                                <span class="text-gray-400">Current User</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                                             No users found
                                         </td>
                                     </tr>
