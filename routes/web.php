@@ -131,6 +131,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->group(function () {
     Route::get('/', [NotificationController::class, 'index'])->name('index');
     Route::put('/{id}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+    Route::get('/{id}/read-and-redirect', [NotificationController::class, 'markAndRedirect'])->name('markAndRedirect');
     Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
     Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unreadCount');
 });

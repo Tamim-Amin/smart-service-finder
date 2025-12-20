@@ -99,7 +99,7 @@
 
                             <div class="max-h-96 overflow-y-auto">
                                 @forelse(auth()->user()->notifications()->limit(5)->get() as $notification)
-                                    <a href="{{ $notification->booking_id ? (auth()->user()->userRole->role === 'provider' ? route('provider.dashboard') : route('customer.bookings')) : '#' }}"
+                                    <a href="{{ route('notifications.markAndRedirect', $notification->id) }}"
                                         class="block px-4 py-3 hover:bg-gray-50 transition {{ !$notification->is_read ? 'bg-blue-50' : '' }}">
                                         <div class="flex items-start">
                                             <div class="flex-shrink-0">
@@ -129,6 +129,16 @@
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </div>
+                                                @elseif($notification->type == 'message_received')
+                                                    <div
+                                                        class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                                         </svg>
                                                     </div>
                                                 @else

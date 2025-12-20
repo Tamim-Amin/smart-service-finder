@@ -12,7 +12,7 @@ class NotificationController extends Controller
     {
         $notifications = Auth::user()->notifications()->paginate(20);
         $unreadCount = Auth::user()->unreadNotifications()->count();
-        
+
         return view('notifications.index', compact('notifications', 'unreadCount'));
     }
 
@@ -20,14 +20,34 @@ class NotificationController extends Controller
     {
         $notification = Notification::where('user_id', Auth::id())->findOrFail($id);
         $notification->update(['is_read' => true]);
-        
+
+        return redirect()->back();
+    }
+
+    public function markAndRedirect($id)
+    {
+        $notification = Notification::where('user_id', Auth::id())->findOrFail($id);
+        $notification->update(['is_read' => true]);
+
+        // Determine redirect based on notification type
+        if ($notification->type === 'message_received' && $notification->booking_id) {
+            return redirect()->route('chat.show', $notification->booking_id);
+        } elseif ($notification->booking_id) {
+            $userRole = Auth::user()->userRole->role ?? null;
+            if ($userRole === 'provider') {
+                return redirect()->route('provider.dashboard');
+            } else {
+                return redirect()->route('customer.bookings');
+            }
+        }
+
         return redirect()->back();
     }
 
     public function markAllAsRead()
     {
         Auth::user()->unreadNotifications()->update(['is_read' => true]);
-        
+
         return redirect()->back()->with('success', 'All notifications marked as read');
     }
 

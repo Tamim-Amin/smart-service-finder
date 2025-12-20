@@ -43,7 +43,7 @@ class ChatController extends Controller
             ->update(['is_read' => true]);
 
         $messages = $booking->messages;
-        
+
         // Determine the other user
         $otherUser = $isCustomer ? $booking->provider->user : $booking->customer;
 
@@ -81,10 +81,21 @@ class ChatController extends Controller
             'message' => $validated['message'],
         ]);
 
+        // Create notification for receiver
+        $senderName = Auth::user()->name;
+        \App\Models\Notification::create([
+            'user_id' => $receiverId,
+            'booking_id' => $bookingId,
+            'type' => 'message_received',
+            'title' => 'New Message from ' . $senderName,
+            'message' => $validated['message'],
+            'is_read' => false,
+        ]);
+
         return redirect()->route('chat.show', $bookingId);
     }
 
-   public function getMessages(Request $request, $bookingId)
+    public function getMessages(Request $request, $bookingId)
     {
         $booking = Booking::findOrFail($bookingId);
         $userId = Auth::id();
