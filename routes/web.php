@@ -91,6 +91,9 @@ Route::middleware(['auth'])->prefix('bookings')->name('bookings.')->group(functi
 
     // Cancel Booking (Customer only)
     Route::put('/{booking}/cancel', [BookingController::class, 'cancel'])->name('cancel');
+
+    // Process Payment (Customer only)
+    Route::post('/{booking}/payment', [BookingController::class, 'processPayment'])->name('payment');
 });
 
 /* Review Routes (Customer only)*/

@@ -12,6 +12,11 @@ class Booking extends Model
         'problem_description',
         'service_date',
         'service_time',
+        'estimated_duration',
+        'estimated_cost',
+        'payment_method',
+        'payment_status',
+        'transaction_id',
         'status',
         'total_amount',  // Add this line
         'total_hours'    // Add this line
@@ -20,6 +25,8 @@ class Booking extends Model
     protected $casts = [
         'service_date' => 'date',
         'total_amount' => 'decimal:2',  // Add this line
+        'estimated_cost' => 'decimal:2', // Add this line
+        'estimated_duration' => 'decimal:2' // Add this line
     ];
 
     public function customer()

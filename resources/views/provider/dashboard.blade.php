@@ -175,6 +175,23 @@
                                                 <p class="text-gray-700 mt-1">{{ $booking->problem_description }}</p>
                                             </div>
                                         </div>
+                                        <div class="flex items-center">
+        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <strong>Duration:</strong> <span class="ml-1">{{ $booking->estimated_duration }} hour(s)</span>
+    </div>
+    <div class="flex items-center">
+        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <strong>Payment:</strong> 
+        <span class="ml-1 px-2 py-0.5 rounded text-xs font-semibold
+            {{ $booking->payment_method === 'cash' ? 'bg-green-100 text-green-800' : 
+               ($booking->payment_method === 'bkash' ? 'bg-pink-100 text-pink-800' : 'bg-orange-100 text-orange-800') }}">
+            {{ ucfirst($booking->payment_method) }}
+        </span>
+    </div>
                                         
                                         @if(isset($booking->total_hours) && isset($booking->total_amount))
                                             <div class="flex items-center mt-2 pt-2 border-t border-gray-200">
@@ -223,37 +240,70 @@
                                     @elseif($booking->status == 'accepted')
                                         <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full font-medium">✓ Accepted</span>
                                         
-                                        <!-- Chat Button -->
-                                        <a href="{{ route('chat.show', $booking->id) }}" 
-                                           class="mt-2 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition flex items-center justify-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                            </svg>
-                                            Chat with Customer
-                                            @if($booking->unreadMessagesFor(Auth::id()) > 0)
-                                                <span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                                                    {{ $booking->unreadMessagesFor(Auth::id()) }}
-                                                </span>
-                                            @endif
-                                        </a>
-                                        
-                                        <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST" class="mt-2 w-full">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="status" value="completed">
-                                            <div class="mb-2">
-                                                <label class="block text-xs text-gray-600 mb-1 font-medium">Total Hours Worked:</label>
-                                                <input type="number" name="total_hours" min="1" max="24" required
-                                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                    placeholder="Enter hours">
-                                            </div>
-                                            <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition flex items-center justify-center font-medium">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        <!-- Payment Status Badge -->
+                                        @if($booking->payment_status === 'paid')
+                                            <span class="bg-green-50 border border-green-200 text-green-700 text-xs px-3 py-1 rounded-full font-semibold flex items-center">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                                 </svg>
-                                                Mark Complete
-                                            </button>
-                                        </form>
+                                                Payment Received
+                                            </span>
+                                            
+                                            <!-- Chat Button -->
+                                            <a href="{{ route('chat.show', $booking->id) }}" 
+                                               class="mt-2 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition flex items-center justify-center">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                                </svg>
+                                                Chat with Customer
+                                                @if($booking->unreadMessagesFor(Auth::id()) > 0)
+                                                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                                        {{ $booking->unreadMessagesFor(Auth::id()) }}
+                                                    </span>
+                                                @endif
+                                            </a>
+
+                                            <!-- Complete Work Button -->
+                                            <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST" class="mt-2 w-full">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="completed">
+                                                <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center justify-center font-medium">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    Complete Service
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="bg-orange-50 border border-orange-200 text-orange-700 text-xs px-3 py-1 rounded-full font-semibold flex items-center">
+                                                <svg class="w-3 h-3 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Awaiting Payment
+                                            </span>
+                                            
+                                            <!-- Chat Button -->
+                                            <a href="{{ route('chat.show', $booking->id) }}" 
+                                               class="mt-2 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition flex items-center justify-center">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                                </svg>
+                                                Chat with Customer
+                                                @if($booking->unreadMessagesFor(Auth::id()) > 0)
+                                                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                                        {{ $booking->unreadMessagesFor(Auth::id()) }}
+                                                    </span>
+                                                @endif
+                                            </a>
+                                        @endif
+                                        
+                                        @if($booking->payment_status === 'paid')
+                                            <div class="mt-2 bg-blue-50 border border-blue-200 rounded p-3 text-center">
+                                                <p class="text-xs text-blue-800 font-semibold">✓ Ready to Complete Service</p>
+                                                <p class="text-xs text-blue-600 mt-1">Service is confirmed. Proceed with the work.</p>
+                                            </div>
+                                        @endif
                                     @elseif($booking->status == 'completed')
                                         <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-medium">✓ Completed</span>
                                         @if(isset($booking->review))
