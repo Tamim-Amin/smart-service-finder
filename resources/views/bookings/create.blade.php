@@ -197,9 +197,13 @@
                                 class="bg-gray-200 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-300 transition">
                                 Cancel
                             </a>
-                            <button type="submit"
-                                class="bg-indigo-600 text-white px-8 py-3 rounded-md hover:bg-indigo-700 transition font-semibold">
-                                Send Booking Request
+                            <button type="submit" id="submitBtn"
+                                class="bg-indigo-600 text-white px-8 py-3 rounded-md hover:bg-indigo-700 transition font-semibold flex items-center disabled:opacity-75 disabled:cursor-not-allowed">
+                                <span id="btnText">Send Booking Request</span>
+                                <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
                             </button>
                         </div>
                     </form>
@@ -210,6 +214,17 @@
     </div>
 
     <script>
+        // Form submission handler with loading indicator
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('loadingSpinner');
+            const btnText = document.getElementById('btnText');
+            
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+            btnText.textContent = 'Sending request...';
+        });
+
         // Calculate estimated cost
         function calculateCost() {
             const hourlyRate = parseFloat(document.getElementById('hourly_rate').value);
