@@ -13,8 +13,12 @@ return new class extends Migration
         });
 
         Schema::table('bookings', function (Blueprint $table) {
-            $table->decimal('total_amount', 10, 2)->nullable()->after('status');
-            $table->integer('total_hours')->nullable()->after('total_amount');
+            if (!Schema::hasColumn('bookings', 'total_amount')) {
+                $table->decimal('total_amount', 10, 2)->nullable()->after('status');
+            }
+            if (!Schema::hasColumn('bookings', 'total_hours')) {
+                $table->decimal('total_hours', 8, 2)->nullable()->after('total_amount');
+            }
         });
     }
 

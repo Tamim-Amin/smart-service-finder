@@ -18,6 +18,13 @@ return new class extends Migration
         $table->text('problem_description');
         $table->date('service_date');
         $table->time('service_time');
+        $table->decimal('estimated_duration', 8, 2)->nullable();
+        $table->decimal('estimated_cost', 10, 2)->nullable();
+        $table->string('payment_method')->nullable();
+        $table->enum('payment_status', ['pending', 'completed', 'failed', 'paid'])->default('pending');
+        $table->string('transaction_id')->nullable()->unique();
+        $table->decimal('total_amount', 10, 2)->nullable();
+        $table->decimal('total_hours', 8, 2)->nullable();
         $table->enum('status', ['pending', 'accepted', 'rejected', 'completed', 'cancelled'])->default('pending');
         $table->timestamps();
     });
