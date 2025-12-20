@@ -1,5 +1,14 @@
-# Sylhet Sheba
+# Project: Sylhet Sheba
+## 👩‍💻 Developer
 
+**Sadiah Rahman Chowdhury**
+- ID: 232-134-023
+- Batch: 5th
+
+**Tamim Amin Suhag**
+- ID: 232-134-024
+- Batch: 5th
+  
 A modern Laravel web application that connects customers with local service providers. Built with Laravel 12, Tailwind CSS, and MySQL.
 
 ## 📋 Project Overview
@@ -227,12 +236,4 @@ For issues or questions, please check the error logs in `storage/logs/`.
 
 This project is open source and available under the MIT License.
 
-## 👩‍💻 Developer
 
-**Sadiah Rahman Chowdhury**
-- ID: 232-134-023
-- Batch: 5th
-
-**Tamim Amin Suhag**
-- ID: 232-134-024
-- Batch: 5th
