@@ -1,363 +1,409 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Provider Dashboard') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Provider Dashboard') }}
+            </h2>
+            <a href="{{ route('provider.profile.edit') }}"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Profile
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                    {{ session('success') }}
-                </div>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd" />
+                </svg>
+                {{ session('success') }}
+            </div>
             @endif
 
             @if(session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-                    {{ session('error') }}
-                </div>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd" />
+                </svg>
+                {{ session('error') }}
+            </div>
             @endif
 
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-                <!-- Total Earnings Card - Clickable -->
-                <div class="bg-gradient-to-br from-green-500 to-green-600 overflow-hidden shadow-lg sm:rounded-lg cursor-pointer hover:shadow-xl transition transform hover:scale-105"
-                     onclick="window.location='{{ route('provider.earnings') }}'">
-                    <div class="p-6 text-white">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-sm opacity-90">Total Earnings</p>
-                            <svg class="w-5 h-5 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
+            <!-- Welcome Section with Provider Info -->
+            <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-8 mb-8 text-white">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center">
+
+                        <div>
+                            <h3 class="text-3xl font-bold mb-1">Welcome back, {{ Auth::user()->name }}! 👋</h3>
+                            <p class="text-indigo-100 mb-3">{{ $provider->category->name }} • {{ $provider->location }}
+                            </p>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-yellow-300 fill-current mr-1" viewBox="0 0 20 20">
+                                        <path
+                                            d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                    </svg>
+                                    <span class="font-bold">{{ number_format($provider->average_rating, 1) }}</span>
+                                    <span class="text-indigo-100 ml-1">({{ $provider->total_reviews }} reviews)</span>
+                                </div>
+                                <div class="text-indigo-100">৳{{ number_format($provider->hourly_rate, 0) }}/hour</div>
+                            </div>
                         </div>
-                        <p class="text-3xl font-bold mb-1">৳{{ number_format($provider->total_earnings ?? 0, 0) }}</p>
-                        <p class="text-xs opacity-75">Click for detailed summary</p>
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        @if($provider->is_verified)
+                        <span
+                            class="bg-white text-green-700 text-sm px-3 py-1 rounded-full font-medium flex items-center justify-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Verified
+                        </span>
+                        @else
+                        <span class="bg-yellow-100 text-yellow-700 text-sm px-3 py-1 rounded-full font-medium">⏳
+                            Pending</span>
+                        @endif
+                        @if($provider->is_available)
+                        <span
+                            class="bg-white text-indigo-700 text-sm px-3 py-1 rounded-full font-medium flex items-center justify-center">
+                            <svg class="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Available
+                        </span>
+                        @else
+                        <span class="bg-gray-200 text-gray-700 text-sm px-3 py-1 rounded-full font-medium">✗
+                            Unavailable</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                <!-- Total Earnings Card -->
+                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-6 text-white cursor-pointer hover:shadow-lg transform hover:scale-105 transition"
+                    onclick="window.location='{{ route('provider.earnings') }}'">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-sm opacity-90">Total Earnings</p>
+                        <svg class="w-6 h-6 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold">৳{{ number_format($provider->total_earnings ?? 0, 0) }}</p>
+                    <p class="text-xs opacity-75 mt-1">View detailed summary</p>
+                </div>
+
+                <!-- Pending Bookings -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Pending</p>
+                            <p class="text-4xl font-bold text-yellow-600 mt-2">{{ $stats['pending'] ?? 0 }}</p>
+                        </div>
+                        <svg class="w-8 h-8 text-yellow-500 opacity-20" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v2h16V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Accepted Bookings -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Accepted</p>
+                            <p class="text-4xl font-bold text-blue-600 mt-2">{{ $stats['accepted'] ?? 0 }}</p>
+                        </div>
+                        <svg class="w-8 h-8 text-blue-500 opacity-20" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Completed Bookings -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Completed</p>
+                            <p class="text-4xl font-bold text-green-600 mt-2">{{ $stats['completed'] ?? 0 }}</p>
+                        </div>
+                        <svg class="w-8 h-8 text-green-500 opacity-20" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fill-rule="evenodd"
+                                d="M4 5a2 2 0 012-2 1 1 0 000-2H6a4 4 0 014 4v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm12.707 5.293a1 1 0 00-1.414-1.414L9 12.586 7.707 11.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
                     </div>
                 </div>
 
                 <!-- Total Bookings -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <p class="text-sm text-gray-600 mb-1">Total Bookings</p>
-                        <p class="text-3xl font-bold text-indigo-600">{{ $stats['total_bookings'] ?? 0 }}</p>
-                    </div>
-                </div>
-
-                <!-- Pending -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <p class="text-sm text-gray-600 mb-1">Pending</p>
-                        <p class="text-3xl font-bold text-yellow-600">{{ $stats['pending'] ?? 0 }}</p>
-                    </div>
-                </div>
-
-                <!-- Accepted -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <p class="text-sm text-gray-600 mb-1">Accepted</p>
-                        <p class="text-3xl font-bold text-green-600">{{ $stats['accepted'] ?? 0 }}</p>
-                    </div>
-                </div>
-
-                <!-- Completed -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <p class="text-sm text-gray-600 mb-1">Completed</p>
-                        <p class="text-3xl font-bold text-blue-600">{{ $stats['completed'] ?? 0 }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Provider Profile Summary -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500 hover:shadow-lg transition">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">{{ Auth::user()->name }}</h3>
-                            <p class="text-indigo-600 font-medium mb-2">{{ $provider->category->name }}</p>
-                            <p class="text-sm text-gray-600 mb-3">{{ $provider->bio }}</p>
-                            
-                            <div class="flex items-center space-x-4 text-sm">
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current mr-1" viewBox="0 0 20 20">
-                                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                                    </svg>
-                                    <span class="font-semibold">{{ number_format($provider->average_rating, 1) }}</span>
-                                    <span class="text-gray-500 ml-1">({{ $provider->total_reviews }} reviews)</span>
-                                </div>
-                                <div class="text-green-600 font-bold">
-                                    ৳{{ number_format($provider->hourly_rate, 0) }}/hr
-                                </div>
-                                <div>
-                                    {{ $provider->experience_years }} years experience
-                                </div>
-                                <div class="flex items-center text-gray-600">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    </svg>
-                                    {{ $provider->location }}
-                                </div>
-                            </div>
+                            <p class="text-gray-600 text-sm font-medium">Total Bookings</p>
+                            <p class="text-4xl font-bold text-indigo-600 mt-2">{{ $stats['total_bookings'] ?? 0 }}</p>
                         </div>
-                        
-                        <div class="flex flex-col items-end space-y-2">
-                            @if($provider->is_verified)
-                                <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">✓ Verified</span>
-                            @else
-                                <span class="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full">⏳ Pending Verification</span>
-                            @endif
-                            
-                            @if($provider->is_available)
-                                <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">✓ Available</span>
-                            @else
-                                <span class="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full">✗ Unavailable</span>
-                            @endif
-                            
-                            <a href="{{ route('provider.earnings') }}" class="text-green-600 hover:text-green-800 text-sm font-medium flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                View Earnings Summary →
-                            </a>
-                            
-                            <a href="{{ route('provider.profile.edit') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                                Edit Profile →
-                            </a>
-                        </div>
+                        <svg class="w-8 h-8 text-indigo-500 opacity-20" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM15 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2h-2zM5 13a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5z" />
+                        </svg>
                     </div>
                 </div>
             </div>
 
-            <!-- Bookings List -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-6">Booking Requests</h3>
+            <!-- Booking Requests Section -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="px-6 py-4 bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Service Requests
+                    </h3>
+                </div>
 
+                <div class="p-6 space-y-4">
                     @forelse($bookings as $booking)
-                        <div class="border border-gray-200 rounded-lg p-4 mb-4 {{ $booking->status == 'completed' ? 'bg-green-50' : '' }} hover:shadow-md transition">
+                    <div
+                        class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                        <!-- Card Header with Status -->
+                        <div
+                            class="bg-gradient-to-r {{ 
+                                                                                                                $booking->status === 'pending' ? 'from-yellow-50 to-yellow-100' :
+                        ($booking->status === 'accepted' ? 'from-blue-50 to-blue-100' : 'from-green-50 to-green-100') 
+                                                                                                            }} p-4 border-b border-gray-200">
                             <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <!-- Customer Profile Photo and Name -->
-                                    <div class="flex items-center mb-3">
-                                        <img src="{{ $booking->customer->profile_photo_url }}" 
-                                             alt="{{ $booking->customer->name }}" 
-                                             class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 mr-3">
-                                        <div>
-                                            <h4 class="text-lg font-semibold">{{ $booking->customer->name }}</h4>
-                                            <span class="text-sm text-gray-500">{{ $booking->customer->email }}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="text-sm text-gray-600 space-y-1 ml-15">
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                            </svg>
-                                            <strong>Date:</strong> <span class="ml-1">{{ $booking->service_date->format('M d, Y') }}</span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            <strong>Time:</strong> <span class="ml-1">{{ date('g:i A', strtotime($booking->service_time)) }}</span>
-                                        </div>
-                                        <div class="flex items-start">
-                                            <svg class="w-4 h-4 mr-2 mt-0.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                            </svg>
-                                            <div>
-                                                <strong>Problem:</strong>
-                                                <p class="text-gray-700 mt-1">{{ $booking->problem_description }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center">
-        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <strong>Duration:</strong> <span class="ml-1">{{ $booking->estimated_duration }} hour(s)</span>
-    </div>
-    <div class="flex items-center">
-        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-        </svg>
-        <strong>Payment:</strong> 
-        <span class="ml-1 px-2 py-0.5 rounded text-xs font-semibold
-            {{ $booking->payment_method === 'cash' ? 'bg-green-100 text-green-800' : 
-               ($booking->payment_method === 'bkash' ? 'bg-pink-100 text-pink-800' : 'bg-orange-100 text-orange-800') }}">
-            {{ ucfirst($booking->payment_method) }}
-        </span>
-    </div>
-                                        
-                                        @if(isset($booking->total_hours) && isset($booking->total_amount))
-                                            <div class="flex items-center mt-2 pt-2 border-t border-gray-200">
-                                                <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                <span class="text-green-600 font-semibold">
-                                                    Earned: ৳{{ number_format($booking->total_amount, 0) }} ({{ $booking->total_hours }} {{ $booking->total_hours > 1 ? 'hours' : 'hour' }})
-                                                </span>
-                                            </div>
-                                        @endif
-                                        
-                                        <p class="text-xs text-gray-500 mt-2">
-                                            Requested: {{ $booking->created_at->diffForHumans() }}
-                                        </p>
+                                <div class="flex items-center space-x-4">
+                                    <img src="{{ $booking->customer->profile_photo_url }}"
+                                        alt="{{ $booking->customer->name }}"
+                                        class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm">
+                                    <div>
+                                        <h4 class="text-lg font-bold text-gray-800">{{ $booking->customer->name }}</h4>
+                                        <p class="text-sm text-gray-600">{{ $booking->customer->email }}</p>
                                     </div>
                                 </div>
-
-                                <div class="ml-4 flex flex-col items-end space-y-2 min-w-[180px]">
-                                    @if($booking->status == 'pending')
-                                        <span class="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full font-medium">⏳ Pending</span>
-                                        <div class="flex flex-col space-y-2 mt-2 w-full">
-                                            <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="status" value="accepted">
-                                                <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center justify-center">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                                    </svg>
-                                                    Accept
-                                                </button>
-                                            </form>
-                                            <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="status" value="rejected">
-                                                <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition flex items-center justify-center">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                                    </svg>
-                                                    Reject
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @elseif($booking->status == 'accepted')
-                                        <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full font-medium">✓ Accepted</span>
-                                        
-                                        <!-- Payment Status Badge -->
-                                        @if($booking->payment_status === 'paid')
-                                            <span class="bg-green-50 border border-green-200 text-green-700 text-xs px-3 py-1 rounded-full font-semibold flex items-center">
-                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                                </svg>
-                                                Payment Received
-                                            </span>
-                                            
-                                            <!-- Chat Button -->
-                                            <a href="{{ route('chat.show', $booking->id) }}" 
-                                               class="mt-2 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition flex items-center justify-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                                </svg>
-                                                Chat with Customer
-                                                @if($booking->unreadMessagesFor(Auth::id()) > 0)
-                                                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                                                        {{ $booking->unreadMessagesFor(Auth::id()) }}
-                                                    </span>
-                                                @endif
-                                            </a>
-
-                                            <!-- Complete Work Button -->
-                                            <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST" class="mt-2 w-full">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="status" value="completed">
-                                                <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center justify-center font-medium">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                    Complete Service
-                                                </button>
-                                            </form>
-                                        @else
-                                            <span class="bg-orange-50 border border-orange-200 text-orange-700 text-xs px-3 py-1 rounded-full font-semibold flex items-center">
-                                                <svg class="w-3 h-3 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                                                </svg>
-                                                Awaiting Payment
-                                            </span>
-                                            
-                                            <!-- Chat Button -->
-                                            <a href="{{ route('chat.show', $booking->id) }}" 
-                                               class="mt-2 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition flex items-center justify-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                                </svg>
-                                                Chat with Customer
-                                                @if($booking->unreadMessagesFor(Auth::id()) > 0)
-                                                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                                                        {{ $booking->unreadMessagesFor(Auth::id()) }}
-                                                    </span>
-                                                @endif
-                                            </a>
-                                        @endif
-                                        
-                                        @if($booking->payment_status === 'paid')
-                                            <div class="mt-2 bg-blue-50 border border-blue-200 rounded p-3 text-center">
-                                                <p class="text-xs text-blue-800 font-semibold">✓ Ready to Complete Service</p>
-                                                <p class="text-xs text-blue-600 mt-1">Service is confirmed. Proceed with the work.</p>
-                                            </div>
-                                        @endif
-                                    @elseif($booking->status == 'completed')
-                                        <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-medium">✓ Completed</span>
-                                        @if(isset($booking->review))
-                                            <div class="mt-2 text-right">
-                                                <p class="text-xs text-gray-600 mb-1">Customer Review:</p>
-                                                <div class="flex items-center justify-end mb-1">
-                                                    @for($i = 1; $i <= 5; $i++)
-                                                        <svg class="w-4 h-4 {{ $i <= $booking->review->rating ? 'text-yellow-400' : 'text-gray-300' }} fill-current" viewBox="0 0 20 20">
-                                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                                                        </svg>
-                                                    @endfor
-                                                </div>
-                                                @if($booking->review->comment)
-                                                    <p class="text-xs text-gray-600 italic max-w-xs bg-gray-50 p-2 rounded">
-                                                        "{{ Str::limit($booking->review->comment, 80) }}"
-                                                    </p>
-                                                @endif
-                                            </div>
-                                        @else
-                                            <p class="text-xs text-gray-500 mt-2">Awaiting customer review</p>
-                                        @endif
-                                    @elseif($booking->status == 'rejected')
-                                        <span class="bg-red-100 text-red-800 text-sm px-3 py-1 rounded-full font-medium">✗ Rejected</span>
-                                    @elseif($booking->status == 'cancelled')
-                                        <span class="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full font-medium">✗ Cancelled</span>
+                                <div class="text-right">
+                                    @if($booking->status === 'pending')
+                                    <span
+                                        class="inline-block bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full">⏳
+                                        PENDING</span>
+                                    @elseif($booking->status === 'accepted')
+                                    <span
+                                        class="inline-block bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">✓
+                                        ACCEPTED</span>
+                                    @else
+                                    <span
+                                        class="inline-block bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">✓
+                                        COMPLETED</span>
                                     @endif
                                 </div>
                             </div>
                         </div>
-                    @empty
-                        <div class="text-center py-12">
-                            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
-                            <h3 class="mt-4 text-lg font-medium text-gray-900">No booking requests yet</h3>
-                            <p class="text-sm text-gray-500 mt-2">When customers book your service, requests will appear here</p>
-                            @if(!$provider->is_verified)
-                                <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 inline-block">
-                                    <p class="text-sm text-yellow-800">
-                                        <strong>Note:</strong> Your profile is pending verification. Once verified by admin, you'll start receiving bookings.
+
+                        <!-- Card Content -->
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="md:col-span-2 space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-indigo-600 mr-3" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-600 font-semibold">DATE</p>
+                                            <p class="text-sm font-bold text-gray-800">
+                                                {{ $booking->service_date->format('M d, Y') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-indigo-600 mr-3" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-600 font-semibold">TIME</p>
+                                            <p class="text-sm font-bold text-gray-800">
+                                                {{ date('g:i A', strtotime($booking->service_time)) }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-indigo-600 mr-3" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-600 font-semibold">DURATION</p>
+                                            <p class="text-sm font-bold text-gray-800">
+                                                {{ $booking->estimated_duration }} hour(s)
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-indigo-600 mr-3" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-600 font-semibold">RATE</p>
+                                            <p class="text-sm font-bold text-gray-800">
+                                                ৳{{ number_format($provider->hourly_rate, 0) }}/hr</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-gray-200">
+                                    <p class="text-xs text-gray-600 font-semibold mb-2">ISSUE</p>
+                                    <p class="text-sm text-gray-700">{{ $booking->problem_description }}</p>
+                                </div>
+
+                                @if(isset($booking->total_amount))
+                                <div class="flex items-center space-x-4 pt-4 border-t border-gray-200">
+                                    <div>
+                                        <p class="text-xs text-gray-600 font-semibold">ESTIMATED COST</p>
+                                        <p class="text-lg font-bold text-green-600">
+                                            ৳{{ number_format($booking->total_amount, 0) }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-600 font-semibold">HOURS</p>
+                                        <p class="text-lg font-bold text-gray-800">{{ $booking->total_hours }}</p>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col space-y-3">
+                                @if($booking->status === 'pending')
+                                <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST"
+                                    class="w-full">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="status" value="accepted">
+                                    <button type="submit"
+                                        class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition flex items-center justify-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Accept
+                                    </button>
+                                </form>
+                                <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST"
+                                    class="w-full">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="status" value="rejected">
+                                    <button type="submit"
+                                        class="w-full bg-gray-400 text-white font-bold py-3 rounded-lg hover:bg-red-600 hover:shadow-lg transform hover:scale-105 transition flex items-center justify-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        Reject
+                                    </button>
+                                </form>
+                                @elseif($booking->status === 'accepted')
+                                @if($booking->payment_status === 'paid')
+                                <div class="bg-green-50 border-2 border-green-300 rounded-lg p-3 text-center mb-2">
+                                    <p class="text-xs font-bold text-green-700 flex items-center justify-center">
+                                        <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        PAYMENT RECEIVED
                                     </p>
                                 </div>
-                            @endif
+                                <a href="{{ route('chat.show', $booking->id) }}"
+                                    class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    Chat
+                                </a>
+                                <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST"
+                                    class="w-full">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="status" value="completed">
+                                    <button type="submit"
+                                        class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition flex items-center justify-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Complete Work
+                                    </button>
+                                </form>
+                                @else
+                                <div class="bg-orange-50 border-2 border-orange-300 rounded-lg p-3 text-center mb-2">
+                                    <p class="text-xs font-bold text-orange-700">⏳ AWAITING PAYMENT</p>
+                                </div>
+                                <a href="{{ route('chat.show', $booking->id) }}"
+                                    class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    Chat
+                                </a>
+                                @endif
+                                @else
+                                <div class="bg-green-100 rounded-lg p-4 text-center">
+                                    <svg class="w-8 h-8 text-green-600 mx-auto mb-2" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <p class="text-green-700 font-bold">Service Completed</p>
+                                </div>
+                                @endif
+                            </div>
                         </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">No booking requests yet</h3>
+                        <p class="text-gray-600 mt-2">You don't have any booking requests at the moment.</p>
+                    </div>
                     @endforelse
-
-                    @if($bookings->count() > 0)
-                        <div class="mt-6">
-                            {{ $bookings->links() }}
-                        </div>
-                    @endif
                 </div>
             </div>
-
         </div>
     </div>
 </x-app-layout>

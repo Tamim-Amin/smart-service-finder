@@ -229,7 +229,6 @@
                         <p class="text-gray-500 text-center py-8">No bookings yet. Start by searching for service providers!
                         </p>
                     @endforelse
-                </div>
 
                     <div class="mt-6">
                         {{ $bookings->links() }}
