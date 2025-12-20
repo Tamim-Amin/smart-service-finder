@@ -14,8 +14,26 @@ class CustomerController extends Controller
     {
         $categories = Category::where('is_active', true)->get();
         $locations = Provider::select('location')->distinct()->pluck('location');
-        
-        return view('customer.dashboard', compact('categories', 'locations'));
+        $recentBookings = Booking::with(['provider.user', 'provider.category'])
+            ->where('customer_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Calculate dashboard stats
+        $activeBookings = Booking::where('customer_id', Auth::id())
+            ->whereIn('status', ['pending', 'accepted'])
+            ->count();
+
+        $completedServices = Booking::where('customer_id', Auth::id())
+            ->where('status', 'completed')
+            ->count();
+
+        $totalSpent = Booking::where('customer_id', Auth::id())
+            ->where('status', 'completed')
+            ->sum('total_amount');
+
+        return view('customer.dashboard', compact('categories', 'locations', 'recentBookings', 'activeBookings', 'completedServices', 'totalSpent'));
     }
 
     public function searchProviders(Request $request)
@@ -32,7 +50,7 @@ class CustomerController extends Controller
         }
 
         if ($request->search) {
-            $query->whereHas('user', function($q) use ($request) {
+            $query->whereHas('user', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%');
             });
         }
